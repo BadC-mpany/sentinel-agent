@@ -11,6 +11,11 @@ venv/
 .env.test.local
 .env.production.local
 
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
 # Logs directory
 logs/
 *.log
