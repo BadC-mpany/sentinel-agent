@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: sentinel-agent
+    ports:
+      - "8001:8001"
+    environment:
+      - AGENT_PORT=8001
+      - SENTINEL_URL=${SENTINEL_URL:-http://host.docker.internal:8000}
+      - SENTINEL_API_KEY=${SENTINEL_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - LLM_MODEL=${LLM_MODEL:-gpt-4-turbo-preview}
+      - OTEL_ENABLED=false
+    depends_on:
+      - mcp
+    restart: unless-stopped
+
+  mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    container_name: sentinel-mcp
+    ports:
+      - "9000:9000"
+    environment:
+      - MCP_PORT=9000
+      - MCP_INTERCEPTOR_TOKEN=${MCP_INTERCEPTOR_TOKEN:-mcp-secret-token}
+    volumes:
+      - ./mcp/data:/app/mcp/data
+    restart: unless-stopped

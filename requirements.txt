@@ -1,0 +1,25 @@
+# Sentinel RAG Template - Dependencies
+
+# Core
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+httpx>=0.26.0
+pyyaml>=6.0.0
+
+# LangChain
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-openai>=0.0.5
+langgraph>=0.0.20
+
+# OpenTelemetry
+opentelemetry-api>=1.22.0
+opentelemetry-sdk>=1.22.0
+opentelemetry-exporter-otlp>=1.22.0
+opentelemetry-instrumentation-httpx>=0.43b0
+
+# Tunneling
+pyngrok>=7.1.0
+-e ../sentinel/sentinel_sdk

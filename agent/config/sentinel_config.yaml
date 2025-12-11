@@ -1,0 +1,65 @@
+version: "1.0"
+service_name: "sentinel-rag-agent"
+
+tools:
+  - name: "read_file"
+    description: "Reads content from a file at the specified path."
+    parameters:
+      - name: "path"
+        type: "string"
+        required: true
+        description: "The file path to read from"
+    taint_rules:
+      - rule_id: "read_file_confidential"
+        condition: "path.startswith('confidential/')"
+        taint_level: "HIGH"
+        requires_approval: true
+      - rule_id: "read_file_public"
+        condition: "path.startswith('public/')"
+        taint_level: "LOW"
+        requires_approval: false
+
+  - name: "web_search"
+    description: "Searches the web for information using a search query."
+    parameters:
+      - name: "query"
+        type: "string"
+        required: true
+        description: "The search query string"
+    taint_rules:
+      - rule_id: "web_search_default"
+        condition: "true"
+        taint_level: "LOW"
+        requires_approval: false
+
+data_classification:
+  levels:
+    - name: "PUBLIC"
+      numeric_level: 0
+      description: "Open access data"
+    - name: "INTERNAL"
+      numeric_level: 1
+      description: "Internal use only"
+    - name: "CONFIDENTIAL"
+      numeric_level: 2
+      description: "Sensitive data requiring approval"
+    - name: "RESTRICTED"
+      numeric_level: 3
+      description: "Highly restricted access"
+
+session:
+  ttl_seconds: 3600
+  max_concurrent_requests: 10
+  require_authentication: true
+
+audit:
+  enabled: true
+  log_tool_calls: true
+  log_responses: true
+  redact_sensitive_data: true
+  retention_days: 90
+
+rate_limiting:
+  enabled: true
+  requests_per_minute: 60
+  burst_limit: 10

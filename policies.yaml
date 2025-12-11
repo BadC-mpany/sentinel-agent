@@ -1,0 +1,29 @@
+customers:
+  - api_key: ''
+    owner: ''
+    mcp_upstream_url: ''
+    policy_name: default_policy
+policies:
+  - name: default_policy
+    static_rules:
+      read_file: ALLOW
+      read_database: ALLOW
+      web_search: ALLOW
+      send_email: ALLOW
+    taint_rules:
+      - action: BLOCK_SECOND
+        tool_class: CONSEQUENTIAL_WRITE
+        error: 'Security Policy: Direct exfiltration pattern detected (read sensitive → external write).'
+        pattern:
+          type: sequence
+          steps:
+            - class: SENSITIVE_READ
+            - class: CONSEQUENTIAL_WRITE
+      - action: ADD_TAINT
+        tool_class: SENSITIVE_READ
+        tag: sensitive_data
+      - action: CHECK_TAINT
+        tool_class: CONSEQUENTIAL_WRITE
+        forbidden_tags:
+          - sensitive_data
+        error: 'Exfiltration blocked: sanitize sensitive data before external write.'
